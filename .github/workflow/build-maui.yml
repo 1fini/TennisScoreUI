@@ -1,0 +1,42 @@
+name: Build .Net 9 Maui & Upload Artifacts
+
+on:
+  push:
+    branches:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .Net 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - run: dotnet workload install maui --skip-signature-checkout
+      - run: dotnet restore
+      - run: dotnet build -c Release -f net9.0-android
+      - uses: actions.upload-artifact@v4
+        with:
+          name: android-apk
+          path: "**/*.apk"
+  
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - run: dotnet workload install maui --skip-signature-checkout
+      - run: dotnet restore
+      - run: dotnet build -c Release -f net9.0-ios
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: "**/*.ipa"
